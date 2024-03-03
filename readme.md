@@ -9,7 +9,6 @@ docker-compose up --build
 
 > Quando a imagem estiver rodando no docker, acesse o terminal de setup-php e execute os seguinte comandos para atualizar o banco:
 ```
-php artisan migrate --seed
 php artisan db:seed --class=ProductSeeder
 php artisan db:seed --class=SaleSeeder
 ```
