@@ -20,5 +20,6 @@ php artisan db:seed --class=SaleSeeder
 
 > Pare eftuar os testes unitários, no terminal de setup-php, execute o seguinte comando:
 ```
-php artisan test
+php artisan test --filter ProductTest --testsuite=Unit
+php artisan test --filter SalesTest --testsuite=Unit
 ```

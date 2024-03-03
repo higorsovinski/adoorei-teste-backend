@@ -12,7 +12,7 @@ class SaleTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function it_can_create_a_sale_with_products()
+    public function test_it_can_create_a_sale_with_products()
     {
         $sale = Sale::factory()->create([
             'amount' => 100.00,
@@ -36,6 +36,5 @@ class SaleTest extends TestCase
                 'amount' => 1,
             ]);
         }
-
     }
 }
