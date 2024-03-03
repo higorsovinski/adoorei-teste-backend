@@ -9,10 +9,13 @@ class Sale extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['sales_id', 'amount'];
+    protected $fillable = ['amount'];
+
+    public $timestamps = true;
 
     public function products()
     {
-        return $this->belongsToMany(Product::class)->withPivot('amount');
+        return $this->belongsToMany(Product::class, 'sale_product', 'sale_id', 'product_id')
+            ->withPivot('amount');
     }
 }

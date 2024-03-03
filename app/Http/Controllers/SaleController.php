@@ -12,13 +12,33 @@ class SaleController extends Controller
     public function index()
     {
         $sales = Sale::with('products')->get();
-        return response()->json($sales);
+
+        $formattedSales = [];
+        foreach ($sales as $sale) {
+            $formattedSale = [
+                'sales_id' => $sale->id,
+                'amount' => $sale->amount,
+                'products' => []
+            ];
+
+            foreach ($sale->products as $product) {
+                $formattedSale['products'][] = [
+                    'product_id' => $product->id,
+                    'nome' => $product->name,
+                    'price' => $product->price,
+                    'amount' => $product->pivot->amount
+                ];
+            }
+
+            $formattedSales[] = $formattedSale;
+        }
+
+        return response()->json($formattedSales);
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'sales_id' => 'required|string|unique:sales',
             'amount' => 'required|numeric',
             'products' => 'required|array',
             'products.*.product_id' => 'required|exists:products,id',
@@ -26,22 +46,40 @@ class SaleController extends Controller
         ]);
 
         $sale = new Sale();
-        $sale->sales_id = $request->sales_id;
         $sale->amount = $request->amount;
         $sale->save();
 
+        $productsToAdd = [];
         foreach ($request->products as $productData) {
-            $product = Product::findOrFail($productData['product_id']);
-            $sale->products()->attach($product->id, ['amount' => $productData['amount']]);
+            $productsToAdd[$productData['product_id']] = ['amount' => $productData['amount']];
         }
+
+        $sale->products()->syncWithoutDetaching($productsToAdd);
 
         return response()->json(['message' => 'Venda registrada com sucesso'], 201);
     }
 
+
     public function show($id)
     {
         $sale = Sale::with('products')->findOrFail($id);
-        return response()->json($sale);
+
+        $formattedSale = [
+            'sales_id' => $sale->id,
+            'amount' => $sale->amount,
+            'products' => []
+        ];
+
+        foreach ($sale->products as $product) {
+            $formattedSale['products'][] = [
+                'product_id' => $product->id,
+                'nome' => $product->name,
+                'price' => $product->price,
+                'amount' => $product->pivot->amount
+            ];
+        }
+
+        return response()->json($formattedSale);
     }
 
     public function cancel($id)
@@ -61,11 +99,14 @@ class SaleController extends Controller
 
         $sale = Sale::findOrFail($id);
 
+        $productsToAdd = [];
         foreach ($request->products as $productData) {
-            $product = Product::findOrFail($productData['product_id']);
-            $sale->products()->attach($product->id, ['amount' => $productData['amount']]);
+            $productsToAdd[$productData['product_id']] = ['amount' => $productData['amount']];
         }
+
+        $sale->products()->syncWithoutDetaching($productsToAdd);
 
         return response()->json(['message' => 'Produtos adicionados à venda com sucesso']);
     }
+
 }

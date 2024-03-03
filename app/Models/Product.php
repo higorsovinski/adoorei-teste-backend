@@ -13,6 +13,8 @@ class Product extends Model
 
     public function sales()
     {
-        return $this->belongsToMany(Sale::class)->withPivot('amount');
+        return $this->belongsToMany(Sale::class, 'sale_product', 'product_id', 'sale_id')
+            ->withPivot('amount');
     }
+
 }
