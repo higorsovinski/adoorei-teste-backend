@@ -62,7 +62,11 @@ class SaleController extends Controller
 
     public function show($id)
     {
-        $sale = Sale::with('products')->findOrFail($id);
+        $sale = Sale::with('products')->find($id);
+
+        if (!$sale) {
+            return response()->json(['message' => 'Venda não encontrada'], 404);
+        }
 
         $formattedSale = [
             'sales_id' => $sale->id,
@@ -84,7 +88,10 @@ class SaleController extends Controller
 
     public function cancel($id)
     {
-        $sale = Sale::findOrFail($id);
+        $sale = Sale::find($id);
+        if (!$sale) {
+            return response()->json(['message' => 'Venda não encontrada'], 404);
+        }
         $sale->delete();
         return response()->json(['message' => 'Venda cancelada com sucesso']);
     }
@@ -97,7 +104,11 @@ class SaleController extends Controller
             'products.*.amount' => 'required|integer|min:1',
         ]);
 
-        $sale = Sale::findOrFail($id);
+        $sale = Sale::find($id);
+
+        if (!$sale) {
+            return response()->json(['message' => 'Venda não encontrada'], 404);
+        }
 
         $productsToAdd = [];
         foreach ($request->products as $productData) {
