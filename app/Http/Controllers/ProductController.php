@@ -33,7 +33,10 @@ class ProductController extends Controller
 
     public function show($id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json(['message' => 'Produto não encontrado'], 404);
+        }
         return response()->json($product);
     }
 
@@ -44,15 +47,20 @@ class ProductController extends Controller
             'price' => 'numeric',
             'description' => 'nullable|string',
         ]);
-
-        $product = Product::findOrFail($id);
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json(['message' => 'Produto não encontrado'], 404);
+        }
         $product->update($request->all());
         return response()->json(['message' => 'Produto atualizado com sucesso']);
     }
 
     public function destroy($id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json(['message' => 'Produto não encontrado'], 404);
+        }
         $product->delete();
         return response()->json(['message' => 'Produto excluído com sucesso']);
     }
